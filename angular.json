@@ -32,6 +32,8 @@
               }
             ],
             "styles": [
+              "node_modules/@angular/cdk/overlay-prebuilt.css",
+              "node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
               "src/styles.scss"
             ],
             "scripts": [],
@@ -103,5 +105,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "2f5b9b56-f8b0-48c3-92d0-a28066c27bd3"
   }
 }
