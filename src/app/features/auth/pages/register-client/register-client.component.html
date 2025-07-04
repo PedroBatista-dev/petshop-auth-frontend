@@ -104,7 +104,7 @@
             <mat-error *ngIf="registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched">
               Confirmação de senha é obrigatória.
             </mat-error>
-            <mat-error *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch')">
+            <mat-error *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('mismatch')">
               As senhas não coincidem.
             </mat-error>
           </mat-form-field>

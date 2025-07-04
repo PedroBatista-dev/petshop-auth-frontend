@@ -1,6 +1,6 @@
 // src/app/features/auth/pages/register-client/register-client.component.ts
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
@@ -46,14 +46,27 @@ export class RegisterClientComponent {
       telefone: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required]
-    }, { validator: this.passwordMatchValidator });
+      confirmPassword: ['', [Validators.required, this.matchPasswords('password', 'confirmPassword')]]
+    });
   }
 
-  private passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { mismatch: true };
+  private matchPasswords(passwordControlName: string, confirmPasswordControlName: string): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const passwordControl = control.root.get(passwordControlName); // Acessa o campo password
+      const confirmPasswordControl = control.root.get(confirmPasswordControlName); // Acessa o campo confirmPassword
+
+      // Garante que ambos os controles existem
+      if (!passwordControl || !confirmPasswordControl) {
+        return null; // Retorna null se os controles não existirem (não deveria acontecer)
+      }
+
+      // Se as senhas são diferentes, retorna o erro 'mismatch'
+      if (passwordControl.value !== confirmPasswordControl.value) {
+        return { mismatch: true };
+      }
+
+      return null; // As senhas coincidem
+    };
   }
 
   onSubmit(): void {
