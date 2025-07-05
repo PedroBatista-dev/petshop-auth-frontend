@@ -1,56 +1,121 @@
-/* src/app/features/auth/pages/login/login.component.scss */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    width: 100%;
-    background-color: #f0f2f5;
+.login-page-wrapper {
+  display: flex;
+  justify-content: center; /* Centraliza o container de conteúdo */
+  align-items: center;   /* Centraliza o container de conteúdo verticalmente */
+  min-height: 100vh;     /* Garante que ocupa a altura total da viewport */
+  width: 100vw;          /* Garante que ocupa a largura total da viewport */
+  background-color: #426B97; /* Cor de fundo principal */
+  overflow: hidden;      /* Evita barras de rolagem indesejadas */
+}
+
+.login-content-container {
+  display: flex;
+  background-color: white; /* Fundo branco para o container da imagem e card */
+  border-radius: 12px;   /* Cantos mais arredondados */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* Sombra mais pronunciada */
+  overflow: hidden;      /* Garante que bordas arredondadas e sombra funcionem */
+  max-width: 960px;      /* Largura máxima do container de conteúdo */
+  width: 90%;            /* Ajuste para responsividade */
+  min-height: 550px;     /* Altura mínima do container */
+}
+
+.login-image-panel {
+  flex: 1; /* Ocupa a metade esquerda do container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  background-color: #F5F5F5; /* Um fundo mais claro para a área da imagem */
+  border-top-left-radius: 12px; /* Arredonda cantos da imagem */
+  border-bottom-left-radius: 12px;
+}
+
+.login-image-panel img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ajusta a imagem dentro do painel */
+}
+
+.login-form-panel {
+  flex: 1; /* Ocupa a metade direita do container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  background-color: #FFFFFF; /* Fundo branco para a área do formulário */
+  border-top-right-radius: 12px; /* Arredonda cantos do formulário */
+  border-bottom-right-radius: 12px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px; /* Largura máxima para o card de login */
+  box-shadow: none; /* Remove a sombra padrão do mat-card, a sombra está no container pai */
+  background-color: transparent; /* Torna o card transparente para usar o fundo do painel */
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 25px;
+  mat-card-title {
+    font-size: 2em; /* Tamanho maior para o título */
+    font-weight: 700; /* Negrito */
+    color: #333333; /* Cinza escuro da paleta */
   }
-  
-  .login-card {
-    width: 100%;
-    max-width: 400px;
+  mat-card-subtitle {
+    color: #666666; /* Cinza médio da paleta */
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espaço entre os campos do formulário */
+}
+
+.full-width {
+  width: 100%;
+}
+
+.login-button {
+  margin-top: 25px;
+  height: 50px; /* Botão mais alto */
+  font-size: 1.2em;
+  background-color: #426B97; /* Cor primária do PetConnect */
+}
+
+.login-actions {
+  display: flex;
+  justify-content: space-between; /* Espaça os botões de ação */
+  margin-top: 20px;
+}
+
+/* Media Queries para responsividade */
+@media (max-width: 850px) {
+  .login-content-container {
+    flex-direction: column; /* Empilha a imagem e o formulário em telas menores */
+    max-width: 420px;
+    min-height: auto;
+  }
+
+  .login-image-panel {
+    min-height: 250px; /* Altura mínima para a imagem em telas menores */
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 12px; /* Ajusta bordas para o modo coluna */
+  }
+
+  .login-form-panel {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 12px; /* Ajusta bordas para o modo coluna */
+  }
+}
+
+@media (max-width: 480px) {
+  .login-content-container {
+    width: 95%; /* Mais largura em telas muito pequenas */
+    padding: 10px;
+  }
+  .login-image-panel, .login-form-panel {
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
   }
-  
-  .login-header {
-    text-align: center;
-    margin-bottom: 20px;
-    mat-card-title {
-      font-size: 1.8em;
-      font-weight: 600;
-    }
-    mat-card-subtitle {
-      color: #666;
-    }
-  }
-  
-  .login-form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .full-width {
-    width: 100%;
-  }
-  
-  .login-button {
-    margin-top: 20px;
-    height: 48px;
-    font-size: 1.1em;
-  }
-  
-  .login-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-  }
-  
-  @media (max-width: 600px) {
-    .login-card {
-      margin: 20px;
-    }
-  }
+}

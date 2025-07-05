@@ -1,45 +1,52 @@
-<div class="login-container mat-app-background">
-    <mat-card class="login-card">
-      <mat-card-header class="login-header">
-        <mat-card-title>Login no Sistema</mat-card-title>
-        <mat-card-subtitle>Acesse sua conta para continuar</mat-card-subtitle>
-      </mat-card-header>
-  
-      <mat-card-content>
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="seuemail@exemplo.com" required>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">
-              Email é obrigatório.
-            </mat-error>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
-              Email inválido.
-            </mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Senha</mat-label>
-            <input matInput type="password" formControlName="password" placeholder="********" required>
-            <mat-error *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
-              Senha é obrigatória.
-            </mat-error>
-            <mat-error *ngIf="loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched">
-              Senha deve ter no mínimo 6 caracteres.
-            </mat-error>
-          </mat-form-field>
-  
-          <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="accent"></mat-progress-bar>
-  
-          <button mat-raised-button color="primary" type="submit" class="full-width login-button" [disabled]="loginForm.invalid || isLoading">
-            <mat-icon>login</mat-icon> Login
-          </button>
-        </form>
-      </mat-card-content>
-  
-      <mat-card-actions class="login-actions">
-        <button mat-button color="accent" (click)="onForgotPassword()">Esqueceu a senha?</button>
-        <button mat-button color="primary" (click)="onRegisterClient()">Cadastre-se como Cliente</button>
-      </mat-card-actions>
-    </mat-card>
+<div class="login-page-wrapper mat-app-background">
+  <div class="login-content-container">
+    <div class="login-image-panel">
+      <img src="images/baby-pomeranian-spitz-playing-winter-day.jpg" alt="Ilustração PetConnect">
+    </div>
+    <div class="login-form-panel">
+      <mat-card class="login-card">
+        <mat-card-header class="login-header">
+          <mat-card-title>Acesso PetConnect</mat-card-title>
+          <mat-card-subtitle>Entre com seu e-mail e senha</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>E-mail</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="seuemail@exemplo.com" required>
+              <mat-error *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">
+                E-mail é obrigatório.
+              </mat-error>
+              <mat-error *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
+                E-mail inválido.
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Senha</mat-label>
+              <input matInput type="password" formControlName="password" placeholder="********" required>
+              <mat-error *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
+                Senha é obrigatória.
+              </mat-error>
+              <mat-error *ngIf="loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched">
+                Senha deve ter no mínimo 6 caracteres.
+              </mat-error>
+            </mat-form-field>
+
+            <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="accent"></mat-progress-bar>
+
+            <button mat-raised-button color="primary" type="submit" class="full-width login-button" [disabled]="loginForm.invalid || isLoading">
+              <mat-icon>lock</mat-icon> Entrar
+            </button>
+          </form>
+        </mat-card-content>
+
+        <mat-card-actions class="login-actions">
+          <button mat-button color="accent" (click)="onForgotPassword()">Esqueceu a senha?</button>
+          <button mat-button color="primary" (click)="onRegisterClient()">Cadastre-se como Cliente</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
   </div>
+</div>

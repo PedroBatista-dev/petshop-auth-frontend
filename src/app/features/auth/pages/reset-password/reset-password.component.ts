@@ -1,6 +1,6 @@
 // src/app/features/auth/pages/reset-password/reset-password.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'; // Adicione ActivatedRoute
 
@@ -35,8 +35,8 @@ export class ResetPasswordComponent implements OnInit {
   ) {
     this.resetPasswordForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validator: this.passwordMatchValidator });
+      confirmPassword: ['', [Validators.required, this.matchPasswords('newPassword', 'confirmPassword')]]
+    });
   }
 
   ngOnInit(): void {
@@ -50,11 +50,23 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
 
-  // Validador customizado para verificar se as senhas coincidem
-  private passwordMatchValidator(form: FormGroup) {
-    const newPassword = form.get('newPassword')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return newPassword === confirmPassword ? null : { mismatch: true };
+  private matchPasswords(passwordControlName: string, confirmPasswordControlName: string): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const passwordControl = control.root.get(passwordControlName); // Acessa o campo password
+      const confirmPasswordControl = control.root.get(confirmPasswordControlName); // Acessa o campo confirmPassword
+
+      // Garante que ambos os controles existem
+      if (!passwordControl || !confirmPasswordControl) {
+        return null; // Retorna null se os controles não existirem (não deveria acontecer)
+      }
+
+      // Se as senhas são diferentes, retorna o erro 'mismatch'
+      if (passwordControl.value !== confirmPasswordControl.value) {
+        return { mismatch: true };
+      }
+
+      return null; // As senhas coincidem
+    };
   }
 
   onSubmit(): void {
