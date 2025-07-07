@@ -49,6 +49,12 @@
     justify-content: space-between;
     margin-top: 15px;
   }
+
+  ngx-password-strength-meter {
+    width: 100%;
+    margin-top: -10px; /* Ajuste o espaçamento para ficar mais próximo do input */
+    margin-bottom: 10px;
+  }
   
   @media (max-width: 600px) {
     .login-card {

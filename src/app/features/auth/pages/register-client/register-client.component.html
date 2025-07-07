@@ -9,21 +9,14 @@
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nome Completo</mat-label>
-            <input matInput formControlName="nomeCompleto" required>
-            <mat-error *ngIf="registerForm.get('nomeCompleto')?.hasError('required') && registerForm.get('nomeCompleto')?.touched">
-              Nome Completo é obrigatório.
-            </mat-error>
+            <input matInput formControlName="nomeCompleto" appAutoFocus appFirstCapitalLetter required>
+            <mat-error [appControlErrorDisplay]="registerForm.get('nomeCompleto')!"></mat-error>
           </mat-form-field>
   
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>CPF</mat-label>
             <input matInput type="text" formControlName="cpf" placeholder="000.000.000-00" required mask="000.000.000-00">
-            <mat-error *ngIf="registerForm.get('cpf')?.hasError('required') && registerForm.get('cpf')?.touched">
-              CPF é obrigatório.
-            </mat-error>
-            <mat-error *ngIf="registerForm.get('cpf')?.hasError('cpfInvalido') && registerForm.get('cpf')?.touched">
-              CPF inválido.
-            </mat-error>
+            <mat-error [appControlErrorDisplay]="registerForm.get('cpf')!"></mat-error>
           </mat-form-field>
   
           <mat-form-field appearance="outline" class="full-width">
@@ -31,15 +24,7 @@
             <input matInput [matDatepicker]="picker" formControlName="dataNascimento" placeholder="DD/MM/AAAA" required>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
-            <mat-error *ngIf="registerForm.get('dataNascimento')?.hasError('required') && registerForm.get('dataNascimento')?.touched">
-              Data de Nascimento é obrigatória.
-            </mat-error>
-            <mat-error *ngIf="registerForm.get('dataNascimento')?.hasError('matDatepickerParse') && registerForm.get('dataNascimento')?.touched">
-              Formato de data inválido. Use DD/MM/AAAA.
-            </mat-error>
-            <mat-error *ngIf="registerForm.get('dataNascimento')?.hasError('matDatepickerInvalid') && registerForm.get('dataNascimento')?.touched">
-              Data inválida.
-            </mat-error>
+            <mat-error [appControlErrorDisplay]="registerForm.get('dataNascimento')!"></mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -49,9 +34,7 @@
               <mat-option value="F">Feminino</mat-option>
               <mat-option value="O">Outro</mat-option>
             </mat-select>
-            <mat-error *ngIf="registerForm.get('sexo')?.hasError('required') && registerForm.get('sexo')?.touched">
-              Sexo é obrigatório.
-            </mat-error>
+            <mat-error [appControlErrorDisplay]="registerForm.get('sexo')!"></mat-error>
           </mat-form-field>
   
           <mat-form-field appearance="outline" class="full-width">
@@ -63,50 +46,31 @@
               <mat-option value="Viúvo">Viúvo</mat-option>
               <mat-option value="União Estável">União Estável</mat-option>
             </mat-select>
-            <mat-error *ngIf="registerForm.get('estadoCivil')?.hasError('required') && registerForm.get('estadoCivil')?.touched">
-              Estado Civil é obrigatório.
-            </mat-error>
+            <mat-error [appControlErrorDisplay]="registerForm.get('estadoCivil')!"></mat-error>
           </mat-form-field>
   
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Telefone</mat-label>
-            <input matInput type="text" formControlName="telefone" placeholder="(00) 00000-0000" required mask="(00) 00000-0000||(00) 0000-0000">
-            <mat-error *ngIf="registerForm.get('telefone')?.hasError('required') && registerForm.get('telefone')?.touched">
-              Telefone é obrigatório.
-            </mat-error>
+            <input matInput type="text" formControlName="telefone" placeholder="(00) 00000-0000 ou (00) 0000-0000" required mask="(00) 00000-0000||(00) 0000-0000">
+            <mat-error [appControlErrorDisplay]="registerForm.get('telefone')!"></mat-error>
           </mat-form-field>
   
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Email</mat-label>
             <input matInput type="email" formControlName="email" placeholder="seuemail@exemplo.com" required>
-            <mat-error *ngIf="registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched">
-              Email é obrigatório.
-            </mat-error>
-            <mat-error *ngIf="registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched">
-              Email inválido.
-            </mat-error>
+            <mat-error [appControlErrorDisplay]="registerForm.get('email')!"></mat-error>
           </mat-form-field>
   
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Senha</mat-label>
             <input matInput type="password" formControlName="password" placeholder="********" required>
-            <mat-error *ngIf="registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched">
-              Senha é obrigatória.
-            </mat-error>
-            <mat-error *ngIf="registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched">
-              Senha deve ter no mínimo 6 caracteres.
-            </mat-error>
+            <mat-error [appControlErrorDisplay]="registerForm.get('password')!"></mat-error>
           </mat-form-field>
   
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Confirmar Senha</mat-label>
             <input matInput type="password" formControlName="confirmPassword" placeholder="********" required>
-            <mat-error *ngIf="registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched">
-              Confirmação de senha é obrigatória.
-            </mat-error>
-            <mat-error *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('mismatch')">
-              As senhas não coincidem.
-            </mat-error>
+            <mat-error [appControlErrorDisplay]="registerForm.get('confirmPassword')!"></mat-error>
           </mat-form-field>
   
           <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="accent"></mat-progress-bar>

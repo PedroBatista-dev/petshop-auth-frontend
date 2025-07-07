@@ -8,9 +8,14 @@ import { MaterialImports } from '../../../../shared/material/material.imports';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { finalize } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http'; // Para registrar o cliente no backend
+import { HttpClient } from '@angular/common/http'; 
 import { environment } from '../../../../../environments/environment';
 import { cpfValidator } from '../../../../shared/validators/cpf.validator';
+import { ControlErrorDisplayDirective } from '../../../../shared/directives/control-error-display.directive';
+import { PrimeiraLetraMaiusculaDirective } from '../../../../shared/directives/first-capital-letter.directive';
+import { AutoFocusDirective } from '../../../../shared/directives/auto-focus.directive';
+import { telefoneValidator } from '../../../../shared/validators/telefone.validator';
+import { strongPasswordValidator } from '../../../../shared/validators/strong-password.validator';
 
 @Component({
   selector: 'app-register-client',
@@ -21,7 +26,10 @@ import { cpfValidator } from '../../../../shared/validators/cpf.validator';
     RouterLink,
     ...MaterialImports,
     NgxMaskDirective,
-    NgxMaskPipe
+    NgxMaskPipe,
+    ControlErrorDisplayDirective,
+    PrimeiraLetraMaiusculaDirective,
+    AutoFocusDirective
   ],
   templateUrl: './register-client.component.html',
   styleUrls: ['./register-client.component.scss']
@@ -38,14 +46,14 @@ export class RegisterClientComponent {
     private http: HttpClient // Injetar HttpClient para fazer a requisição de registro
   ) {
     this.registerForm = this.fb.group({
-      nomeCompleto: ['', Validators.required],
+      nomeCompleto: ['', [Validators.required, Validators.minLength(3)]],
       cpf: ['', [Validators.required, cpfValidator()]],
-      dataNascimento: ['', Validators.required], // Pode precisar de um MatDatePicker
+      dataNascimento: ['', Validators.required], 
       sexo: ['', Validators.required],
       estadoCivil: ['', Validators.required],
-      telefone: ['', Validators.required],
+      telefone: ['', [Validators.required, telefoneValidator()]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, strongPasswordValidator()]],
       confirmPassword: ['', [Validators.required, this.matchPasswords('password', 'confirmPassword')]]
     });
   }
