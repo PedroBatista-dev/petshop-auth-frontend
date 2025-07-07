@@ -10,16 +10,15 @@ import { NotificationService } from '../../../../shared/services/notification.se
 import { finalize } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-reset-password',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink,
-    ...MaterialImports
-  ],
-  templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.scss']
+    selector: 'app-reset-password',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterLink,
+        ...MaterialImports
+    ],
+    templateUrl: './reset-password.component.html',
+    styleUrls: ['./reset-password.component.scss']
 })
 export class ResetPasswordComponent implements OnInit {
   resetPasswordForm: FormGroup;

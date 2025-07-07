@@ -10,16 +10,15 @@ import { NotificationService } from '../../../../shared/services/notification.se
 import { finalize } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-forgot-password',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink,
-    ...MaterialImports
-  ],
-  templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+    selector: 'app-forgot-password',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterLink,
+        ...MaterialImports
+    ],
+    templateUrl: './forgot-password.component.html',
+    styleUrls: ['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent {
   forgotPasswordForm: FormGroup;

@@ -18,21 +18,20 @@ import { telefoneValidator } from '../../../../shared/validators/telefone.valida
 import { strongPasswordValidator } from '../../../../shared/validators/strong-password.validator';
 
 @Component({
-  selector: 'app-register-client',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink,
-    ...MaterialImports,
-    NgxMaskDirective,
-    NgxMaskPipe,
-    ControlErrorDisplayDirective,
-    PrimeiraLetraMaiusculaDirective,
-    AutoFocusDirective
-  ],
-  templateUrl: './register-client.component.html',
-  styleUrls: ['./register-client.component.scss']
+    selector: 'app-register-client',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterLink,
+        ...MaterialImports,
+        NgxMaskDirective,
+        NgxMaskPipe,
+        ControlErrorDisplayDirective,
+        PrimeiraLetraMaiusculaDirective,
+        AutoFocusDirective
+    ],
+    templateUrl: './register-client.component.html',
+    styleUrls: ['./register-client.component.scss']
 })
 export class RegisterClientComponent {
   registerForm: FormGroup;

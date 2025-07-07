@@ -10,16 +10,15 @@ import { NotificationService } from '../../../../shared/services/notification.se
 import { finalize } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink, // Importe RouterLink aqui
-    ...MaterialImports
-  ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    selector: 'app-login',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterLink, // Importe RouterLink aqui
+        ...MaterialImports
+    ],
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
