@@ -2,20 +2,23 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router'; // Adicione ActivatedRoute
+import { ActivatedRoute, Router } from '@angular/router'; // Adicione ActivatedRoute
 
 import { MaterialImports } from '../../../../shared/material/material.imports';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { finalize } from 'rxjs/operators';
+import { debounceTime, finalize } from 'rxjs/operators';
+import { strongPasswordValidator } from '../../../../shared/validators/strong-password.validator';
+import zxcvbn from 'zxcvbn';
+import { ControlErrorDisplayDirective } from '../../../../shared/directives/control-error-display.directive';
 
 @Component({
     selector: 'app-reset-password',
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        RouterLink,
-        ...MaterialImports
+        ...MaterialImports,
+        ControlErrorDisplayDirective
     ],
     templateUrl: './reset-password.component.html',
     styleUrls: ['./reset-password.component.scss']
@@ -25,6 +28,10 @@ export class ResetPasswordComponent implements OnInit {
   isLoading = false;
   token: string | null = null; // Armazena o token da URL
 
+  passwordStrength = 0; // Pontuação de 0 a 100%
+  passwordStrengthText = 'Nenhuma';
+  passwordStrengthColor = 'warn';
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -33,7 +40,7 @@ export class ResetPasswordComponent implements OnInit {
     private route: ActivatedRoute // Injete ActivatedRoute para ler parâmetros da URL
   ) {
     this.resetPasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, strongPasswordValidator()]],
       confirmPassword: ['', [Validators.required, this.matchPasswords('newPassword', 'confirmPassword')]]
     });
   }
@@ -47,6 +54,51 @@ export class ResetPasswordComponent implements OnInit {
         this.router.navigate(['/auth/forgot-password']); // Redireciona se não tiver token
       }
     });
+
+    // Observa as mudanças no campo 'password' para calcular a força
+    this.resetPasswordForm.get('newPassword')?.valueChanges
+      .pipe(
+        debounceTime(300) // Espera 300ms para o usuário parar de digitar
+      )
+      .subscribe(password => {
+        if (password) {
+          const result = zxcvbn(password);
+          this.passwordStrength = (result.score + 1) * 20; // Pontuação de 0-4 mapeada para 0-100 (passos de 20%)
+          this.updatePasswordStrengthText(result.score);
+        } else {
+          this.passwordStrength = 0;
+          this.passwordStrengthText = 'Nenhuma';
+          this.passwordStrengthColor = 'warn';
+        }
+      });
+  }
+
+  private updatePasswordStrengthText(score: number): void {
+    switch (score) {
+      case 0:
+        this.passwordStrengthText = 'Muito Fraca';
+        this.passwordStrengthColor = 'warn';
+        break;
+      case 1:
+        this.passwordStrengthText = 'Fraca';
+        this.passwordStrengthColor = 'warn';
+        break;
+      case 2:
+        this.passwordStrengthText = 'Média';
+        this.passwordStrengthColor = 'accent';
+        break;
+      case 3:
+        this.passwordStrengthText = 'Boa';
+        this.passwordStrengthColor = 'primary';
+        break;
+      case 4:
+        this.passwordStrengthText = 'Excelente';
+        this.passwordStrengthColor = 'primary';
+        break;
+      default:
+        this.passwordStrengthText = 'Nenhuma';
+        this.passwordStrengthColor = 'warn';
+    }
   }
 
   private matchPasswords(passwordControlName: string, confirmPasswordControlName: string): ValidatorFn {

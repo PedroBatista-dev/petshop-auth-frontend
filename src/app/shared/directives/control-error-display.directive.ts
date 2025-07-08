@@ -25,7 +25,9 @@ export class ControlErrorDisplayDirective implements AfterViewChecked {
     uppercaseRequired: 'Pelo menos 1 letra maiúscula.',
     lowercaseRequired: 'Pelo menos 1 letra minúscula.',
     numericRequired: 'Pelo menos 1 número.',
-    specialCharRequired: 'Pelo menos 1 caractere especial.'
+    specialCharRequired: 'Pelo menos 1 caractere especial.',
+    dateFormatInvalido: 'Data inválida. Use DD/MM/AAAA.',
+    dateInFuture: 'Data não pode ser no futuro.'
   };
 
   constructor(private el: ElementRef) {}

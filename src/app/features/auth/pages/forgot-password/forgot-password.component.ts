@@ -2,7 +2,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { MaterialImports } from '../../../../shared/material/material.imports';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -14,7 +14,6 @@ import { finalize } from 'rxjs/operators';
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        RouterLink,
         ...MaterialImports
     ],
     templateUrl: './forgot-password.component.html',

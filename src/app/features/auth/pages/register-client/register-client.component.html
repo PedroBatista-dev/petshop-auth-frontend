@@ -19,11 +19,11 @@
             <mat-error [appControlErrorDisplay]="registerForm.get('cpf')!"></mat-error>
           </mat-form-field>
   
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="full-width" (click)="picker.open()">
             <mat-label>Data de Nascimento</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="dataNascimento" placeholder="DD/MM/AAAA" required>
+            <input matInput [matDatepicker]="picker" formControlName="dataNascimento" placeholder="DD/MM/AAAA" readonly required>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
+            <mat-datepicker touchUi #picker></mat-datepicker>
             <mat-error [appControlErrorDisplay]="registerForm.get('dataNascimento')!"></mat-error>
           </mat-form-field>
 
@@ -66,6 +66,10 @@
             <input matInput type="password" formControlName="password" placeholder="********" required>
             <mat-error [appControlErrorDisplay]="registerForm.get('password')!"></mat-error>
           </mat-form-field>
+          <div class="password-strength-indicator">
+            <mat-progress-bar mode="determinate" [value]="passwordStrength" [color]="passwordStrengthColor"></mat-progress-bar>
+            <span [ngClass]="'strength-text-' + passwordStrengthColor">{{ passwordStrengthText }}</span>
+          </div>
   
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Confirmar Senha</mat-label>

@@ -1,13 +1,13 @@
 // src/app/features/auth/pages/register-client/register-client.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { MaterialImports } from '../../../../shared/material/material.imports';
-import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
+import { NgxMaskDirective } from 'ngx-mask';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { finalize } from 'rxjs/operators';
+import { debounceTime, finalize } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http'; 
 import { environment } from '../../../../../environments/environment';
 import { cpfValidator } from '../../../../shared/validators/cpf.validator';
@@ -16,38 +16,43 @@ import { PrimeiraLetraMaiusculaDirective } from '../../../../shared/directives/f
 import { AutoFocusDirective } from '../../../../shared/directives/auto-focus.directive';
 import { telefoneValidator } from '../../../../shared/validators/telefone.validator';
 import { strongPasswordValidator } from '../../../../shared/validators/strong-password.validator';
+import zxcvbn from 'zxcvbn';
+import { dateFormatValidator } from '../../../../shared/validators/date-format.validator';
+import moment, { Moment } from 'moment';
 
 @Component({
     selector: 'app-register-client',
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        RouterLink,
         ...MaterialImports,
         NgxMaskDirective,
-        NgxMaskPipe,
         ControlErrorDisplayDirective,
         PrimeiraLetraMaiusculaDirective,
-        AutoFocusDirective
+        AutoFocusDirective,
     ],
     templateUrl: './register-client.component.html',
     styleUrls: ['./register-client.component.scss']
 })
-export class RegisterClientComponent {
+export class RegisterClientComponent implements OnInit {
   registerForm: FormGroup;
   isLoading = false;
   private apiUrl = environment.backendAuthUrl;
+
+  passwordStrength = 0; 
+  passwordStrengthText = 'Nenhuma';
+  passwordStrengthColor = 'warn';
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private notificationService: NotificationService,
-    private http: HttpClient // Injetar HttpClient para fazer a requisição de registro
+    private http: HttpClient 
   ) {
     this.registerForm = this.fb.group({
       nomeCompleto: ['', [Validators.required, Validators.minLength(3)]],
       cpf: ['', [Validators.required, cpfValidator()]],
-      dataNascimento: ['', Validators.required], 
+      dataNascimento: ['', [Validators.required, dateFormatValidator()]], 
       sexo: ['', Validators.required],
       estadoCivil: ['', Validators.required],
       telefone: ['', [Validators.required, telefoneValidator()]],
@@ -56,6 +61,54 @@ export class RegisterClientComponent {
       confirmPassword: ['', [Validators.required, this.matchPasswords('password', 'confirmPassword')]]
     });
   }
+
+  ngOnInit(): void {
+    // Observa as mudanças no campo 'password' para calcular a força
+    this.registerForm.get('password')?.valueChanges
+      .pipe(
+        debounceTime(300) // Espera 300ms para o usuário parar de digitar
+      )
+      .subscribe(password => {
+        if (password) {
+          const result = zxcvbn(password);
+          this.passwordStrength = (result.score + 1) * 20; // Pontuação de 0-4 mapeada para 0-100 (passos de 20%)
+          this.updatePasswordStrengthText(result.score);
+        } else {
+          this.passwordStrength = 0;
+          this.passwordStrengthText = 'Nenhuma';
+          this.passwordStrengthColor = 'warn';
+        }
+      });
+  }
+
+  private updatePasswordStrengthText(score: number): void {
+    switch (score) {
+      case 0:
+        this.passwordStrengthText = 'Muito Fraca';
+        this.passwordStrengthColor = 'warn';
+        break;
+      case 1:
+        this.passwordStrengthText = 'Fraca';
+        this.passwordStrengthColor = 'warn';
+        break;
+      case 2:
+        this.passwordStrengthText = 'Média';
+        this.passwordStrengthColor = 'accent';
+        break;
+      case 3:
+        this.passwordStrengthText = 'Boa';
+        this.passwordStrengthColor = 'primary';
+        break;
+      case 4:
+        this.passwordStrengthText = 'Excelente';
+        this.passwordStrengthColor = 'primary';
+        break;
+      default:
+        this.passwordStrengthText = 'Nenhuma';
+        this.passwordStrengthColor = 'warn';
+    }
+  }
+
 
   private matchPasswords(passwordControlName: string, confirmPasswordControlName: string): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
@@ -79,6 +132,7 @@ export class RegisterClientComponent {
   onSubmit(): void {
     if (this.registerForm.invalid) {
       this.notificationService.error('Erro no Formulário', 'Por favor, preencha todos os campos corretamente.');
+      this.registerForm.markAllAsTouched();
       return;
     }
 
@@ -86,9 +140,16 @@ export class RegisterClientComponent {
     const formValue = this.registerForm.value;
 
     let dataNascimentoFormatada = '';
-    if (formValue.dataNascimento) {
-      const date = new Date(formValue.dataNascimento);
-      dataNascimentoFormatada = date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    // Verifica se dataNascimento é um objeto Moment válido antes de formatar
+    if (formValue.dataNascimento && moment.isMoment(formValue.dataNascimento) && formValue.dataNascimento.isValid()) {
+      dataNascimentoFormatada = formValue.dataNascimento.format('YYYY-MM-DD'); // Formato AAAA-MM-DD para o backend
+    } else {
+      // Se não for um Moment válido, ou for null, trate como erro ou envie null/string vazia
+      // Dependendo da sua API, você pode querer lançar um erro ou enviar null
+      console.error('Data de nascimento inválida ou ausente para envio ao backend.');
+      this.notificationService.error('Erro de Dados', 'A data de nascimento não está em um formato válido.');
+      this.isLoading = false;
+      return;
     }
 
     // O backend espera 'dataNascimento' como string AAAA-MM-DD

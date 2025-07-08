@@ -18,5 +18,5 @@ export const MaterialImports = [
   MatProgressBarModule,
   MatSelectModule,     
   MatDatepickerModule, 
-  MatNativeDateModule  
+  MatNativeDateModule
 ];

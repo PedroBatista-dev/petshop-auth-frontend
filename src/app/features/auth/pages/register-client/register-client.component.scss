@@ -1,4 +1,4 @@
-/* src/app/features/auth/pages/login/login.component.scss */
+
 .login-container {
     display: flex;
     justify-content: center;
@@ -50,10 +50,32 @@
     margin-top: 15px;
   }
 
-  ngx-password-strength-meter {
+  .password-strength-indicator {
+    margin-bottom: 15px;
     width: 100%;
-    margin-top: -10px; /* Ajuste o espaçamento para ficar mais próximo do input */
-    margin-bottom: 10px;
+    text-align: right; /* Alinha o texto à direita */
+  
+    mat-progress-bar {
+      height: 6px; /* Altura da barra */
+      border-radius: 3px;
+    }
+  
+    // Estilos para o texto da força (cores da paleta PetConnect)
+    span.strength-text-warn {
+      color: #ff0000; /* Vermelho para "Fraca" */
+      font-weight: bold;
+      font-size: 0.8em;
+    }
+    span.strength-text-accent {
+      color: #ff9900; /* Laranja para "Média" */
+      font-weight: bold;
+      font-size: 0.8em;
+    }
+    span.strength-text-primary {
+      color: #008000; /* Verde para "Boa" / "Excelente" */
+      font-weight: bold;
+      font-size: 0.8em;
+    }
   }
   
   @media (max-width: 600px) {
