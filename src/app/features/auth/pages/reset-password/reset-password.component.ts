@@ -1,8 +1,8 @@
 // src/app/features/auth/pages/reset-password/reset-password.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router'; // Adicione ActivatedRoute
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { MaterialImports } from '../../../../shared/material/material.imports';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -32,6 +32,9 @@ export class ResetPasswordComponent implements OnInit {
   passwordStrengthText = 'Nenhuma';
   passwordStrengthColor = 'warn';
 
+  hidePassword = true;
+  hideConfirmPassword = true;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -41,7 +44,12 @@ export class ResetPasswordComponent implements OnInit {
   ) {
     this.resetPasswordForm = this.fb.group({
       newPassword: ['', [Validators.required, strongPasswordValidator()]],
-      confirmPassword: ['', [Validators.required, this.matchPasswords('newPassword', 'confirmPassword')]]
+      confirmPassword: ['', [Validators.required]]
+    },
+    {
+      validators: [
+        this.matchPasswordsGroup
+      ]
     });
   }
 
@@ -101,24 +109,25 @@ export class ResetPasswordComponent implements OnInit {
     }
   }
 
-  private matchPasswords(passwordControlName: string, confirmPasswordControlName: string): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: any } | null => {
-      const passwordControl = control.root.get(passwordControlName); // Acessa o campo password
-      const confirmPasswordControl = control.root.get(confirmPasswordControlName); // Acessa o campo confirmPassword
+  private matchPasswordsGroup: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
+    const passwordControl = group.get('newPassword');
+    const confirmPasswordControl = group.get('confirmPassword');
 
-      // Garante que ambos os controles existem
-      if (!passwordControl || !confirmPasswordControl) {
-        return null; // Retorna null se os controles não existirem (não deveria acontecer)
-      }
+    if (!passwordControl || !confirmPasswordControl) {
+      return null;
+    }
 
-      // Se as senhas são diferentes, retorna o erro 'mismatch'
-      if (passwordControl.value !== confirmPasswordControl.value) {
-        return { mismatch: true };
-      }
+    if (passwordControl.value !== confirmPasswordControl.value && (confirmPasswordControl.touched || confirmPasswordControl.dirty)) {
+      confirmPasswordControl.setErrors({ mismatch: true });
+      return { mismatch: true };
+    }
 
-      return null; // As senhas coincidem
-    };
-  }
+    if (passwordControl.value === confirmPasswordControl.value && confirmPasswordControl.hasError('mismatch')) {
+        confirmPasswordControl.setErrors(null);
+    }
+
+    return null; 
+  };
 
   onSubmit(): void {
     if (this.resetPasswordForm.invalid) {

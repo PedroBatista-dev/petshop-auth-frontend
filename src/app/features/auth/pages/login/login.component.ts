@@ -8,13 +8,15 @@ import { MaterialImports } from '../../../../shared/material/material.imports';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { finalize } from 'rxjs/operators';
+import { ControlErrorDisplayDirective } from '../../../../shared/directives/control-error-display.directive';
 
 @Component({
     selector: 'app-login',
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        ...MaterialImports
+        ...MaterialImports,
+        ControlErrorDisplayDirective,
     ],
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']

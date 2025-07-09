@@ -1,6 +1,6 @@
 // src/app/features/auth/pages/register-client/register-client.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidatorFn } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -18,7 +18,6 @@ import { telefoneValidator } from '../../../../shared/validators/telefone.valida
 import { strongPasswordValidator } from '../../../../shared/validators/strong-password.validator';
 import zxcvbn from 'zxcvbn';
 import { dateFormatValidator } from '../../../../shared/validators/date-format.validator';
-import moment, { Moment } from 'moment';
 
 @Component({
     selector: 'app-register-client',
@@ -43,6 +42,9 @@ export class RegisterClientComponent implements OnInit {
   passwordStrengthText = 'Nenhuma';
   passwordStrengthColor = 'warn';
 
+  hidePassword = true;
+  hideConfirmPassword = true;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -58,7 +60,12 @@ export class RegisterClientComponent implements OnInit {
       telefone: ['', [Validators.required, telefoneValidator()]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, strongPasswordValidator()]],
-      confirmPassword: ['', [Validators.required, this.matchPasswords('password', 'confirmPassword')]]
+      confirmPassword: ['', [Validators.required]]
+    },
+    {
+      validators: [
+        this.matchPasswordsGroup
+      ]
     });
   }
 
@@ -110,24 +117,25 @@ export class RegisterClientComponent implements OnInit {
   }
 
 
-  private matchPasswords(passwordControlName: string, confirmPasswordControlName: string): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: any } | null => {
-      const passwordControl = control.root.get(passwordControlName); // Acessa o campo password
-      const confirmPasswordControl = control.root.get(confirmPasswordControlName); // Acessa o campo confirmPassword
+  private matchPasswordsGroup: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
+    const passwordControl = group.get('password');
+    const confirmPasswordControl = group.get('confirmPassword');
 
-      // Garante que ambos os controles existem
-      if (!passwordControl || !confirmPasswordControl) {
-        return null; // Retorna null se os controles não existirem (não deveria acontecer)
-      }
+    if (!passwordControl || !confirmPasswordControl) {
+      return null;
+    }
 
-      // Se as senhas são diferentes, retorna o erro 'mismatch'
-      if (passwordControl.value !== confirmPasswordControl.value) {
-        return { mismatch: true };
-      }
+    if (passwordControl.value !== confirmPasswordControl.value && (confirmPasswordControl.touched || confirmPasswordControl.dirty)) {
+      confirmPasswordControl.setErrors({ mismatch: true });
+      return { mismatch: true };
+    }
 
-      return null; // As senhas coincidem
-    };
-  }
+    if (passwordControl.value === confirmPasswordControl.value && confirmPasswordControl.hasError('mismatch')) {
+        confirmPasswordControl.setErrors(null);
+    }
+
+    return null; 
+  };
 
   onSubmit(): void {
     if (this.registerForm.invalid) {
@@ -139,24 +147,10 @@ export class RegisterClientComponent implements OnInit {
     this.isLoading = true;
     const formValue = this.registerForm.value;
 
-    let dataNascimentoFormatada = '';
-    // Verifica se dataNascimento é um objeto Moment válido antes de formatar
-    if (formValue.dataNascimento && moment.isMoment(formValue.dataNascimento) && formValue.dataNascimento.isValid()) {
-      dataNascimentoFormatada = formValue.dataNascimento.format('YYYY-MM-DD'); // Formato AAAA-MM-DD para o backend
-    } else {
-      // Se não for um Moment válido, ou for null, trate como erro ou envie null/string vazia
-      // Dependendo da sua API, você pode querer lançar um erro ou enviar null
-      console.error('Data de nascimento inválida ou ausente para envio ao backend.');
-      this.notificationService.error('Erro de Dados', 'A data de nascimento não está em um formato válido.');
-      this.isLoading = false;
-      return;
-    }
-
-    // O backend espera 'dataNascimento' como string AAAA-MM-DD
     const userData = {
       nomeCompleto: formValue.nomeCompleto,
       cpf: formValue.cpf,
-      dataNascimento: dataNascimentoFormatada, // Assumindo formato YYYY-MM-DD
+      dataNascimento: formValue.dataNascimento, // Assumindo formato YYYY-MM-DD
       sexo: formValue.sexo,
       estadoCivil: formValue.estadoCivil,
       telefone: formValue.telefone,

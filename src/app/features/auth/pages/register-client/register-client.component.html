@@ -1,92 +1,141 @@
-<div class="login-container mat-app-background">
-    <mat-card class="login-card">
-      <mat-card-header class="login-header">
-        <mat-card-title>Cadastro de Cliente</mat-card-title>
-        <mat-card-subtitle>Preencha os dados para criar sua conta</mat-card-subtitle>
-      </mat-card-header>
-  
-      <mat-card-content>
-        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nome Completo</mat-label>
-            <input matInput formControlName="nomeCompleto" appAutoFocus appFirstCapitalLetter required>
-            <mat-error [appControlErrorDisplay]="registerForm.get('nomeCompleto')!"></mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>CPF</mat-label>
-            <input matInput type="text" formControlName="cpf" placeholder="000.000.000-00" required mask="000.000.000-00">
-            <mat-error [appControlErrorDisplay]="registerForm.get('cpf')!"></mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width" (click)="picker.open()">
-            <mat-label>Data de Nascimento</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="dataNascimento" placeholder="DD/MM/AAAA" readonly required>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker touchUi #picker></mat-datepicker>
-            <mat-error [appControlErrorDisplay]="registerForm.get('dataNascimento')!"></mat-error>
-          </mat-form-field>
+<div class="login-page-wrapper mat-app-background">
+  <div class="login-content-container">
+    <!-- Painel da Esquerda (simulando a área da imagem do login) -->
+    <div class="login-image-panel">
+      <mat-icon style="font-size: 120px; width: 120px; height: 120px; color: #76A0D9;">pets</mat-icon>
+    </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Sexo</mat-label>
-            <mat-select formControlName="sexo" required>
-              <mat-option value="M">Masculino</mat-option>
-              <mat-option value="F">Feminino</mat-option>
-              <mat-option value="O">Outro</mat-option>
-            </mat-select>
-            <mat-error [appControlErrorDisplay]="registerForm.get('sexo')!"></mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Estado Civil</mat-label>
-            <mat-select formControlName="estadoCivil" required>
-              <mat-option value="Solteiro">Solteiro</mat-option>
-              <mat-option value="Casado">Casado</mat-option>
-              <mat-option value="Divorciado">Divorciado</mat-option>
-              <mat-option value="Viúvo">Viúvo</mat-option>
-              <mat-option value="União Estável">União Estável</mat-option>
-            </mat-select>
-            <mat-error [appControlErrorDisplay]="registerForm.get('estadoCivil')!"></mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Telefone</mat-label>
-            <input matInput type="text" formControlName="telefone" placeholder="(00) 00000-0000 ou (00) 0000-0000" required mask="(00) 00000-0000||(00) 0000-0000">
-            <mat-error [appControlErrorDisplay]="registerForm.get('telefone')!"></mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="seuemail@exemplo.com" required>
-            <mat-error [appControlErrorDisplay]="registerForm.get('email')!"></mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Senha</mat-label>
-            <input matInput type="password" formControlName="password" placeholder="********" required>
-            <mat-error [appControlErrorDisplay]="registerForm.get('password')!"></mat-error>
-          </mat-form-field>
-          <div class="password-strength-indicator">
-            <mat-progress-bar mode="determinate" [value]="passwordStrength" [color]="passwordStrengthColor"></mat-progress-bar>
-            <span [ngClass]="'strength-text-' + passwordStrengthColor">{{ passwordStrengthText }}</span>
-          </div>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Confirmar Senha</mat-label>
-            <input matInput type="password" formControlName="confirmPassword" placeholder="********" required>
-            <mat-error [appControlErrorDisplay]="registerForm.get('confirmPassword')!"></mat-error>
-          </mat-form-field>
-  
-          <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="accent"></mat-progress-bar>
-  
-          <button mat-raised-button color="primary" type="submit" class="full-width login-button" [disabled]="registerForm.invalid || isLoading">
-            <mat-icon>person_add</mat-icon> Cadastrar
-          </button>
-        </form>
-      </mat-card-content>
-  
-      <mat-card-actions class="login-actions">
-        <button mat-button color="accent" (click)="onBackToLogin()">Voltar ao Login</button>
-      </mat-card-actions>
-    </mat-card>
+    <!-- Painel da Direita (onde o card de cadastro ficará) -->
+    <div class="login-form-panel">
+      <mat-card class="login-card">
+        <mat-card-header class="login-header">
+          <mat-card-title>Cadastro de Cliente</mat-card-title>
+          <mat-card-subtitle>Preencha os dados para criar sua conta PetConnect</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
+            <!-- Linha 1: Nome Completo (ocupa a largura total) -->
+            <div class="row">
+              <div class="col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Nome Completo</mat-label>
+                  <input matInput formControlName="nomeCompleto" appAutoFocus appFirstCapitalLetter required>
+                  <mat-error [appControlErrorDisplay]="registerForm.get('nomeCompleto')!"></mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Linha 2: CPF e Data de Nascimento -->
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>CPF</mat-label>
+                  <input matInput type="text" formControlName="cpf" placeholder="000.000.000-00" required mask="000.000.000-00">
+                  <mat-error [appControlErrorDisplay]="registerForm.get('cpf')!"></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width" (click)="picker.open()">
+                  <mat-label>Data de Nascimento</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="dataNascimento" placeholder="DD/MM/AAAA" readonly required>
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker touchUi #picker></mat-datepicker>
+                  <mat-error [appControlErrorDisplay]="registerForm.get('dataNascimento')!"></mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Linha 3: Sexo e Estado Civil -->
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Sexo</mat-label>
+                  <mat-select formControlName="sexo" required>
+                    <mat-option value="M">Masculino</mat-option>
+                    <mat-option value="F">Feminino</mat-option>
+                    <mat-option value="O">Outro</mat-option>
+                  </mat-select>
+                  <mat-error [appControlErrorDisplay]="registerForm.get('sexo')!"></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Estado Civil</mat-label>
+                  <mat-select formControlName="estadoCivil" required>
+                    <mat-option value="Solteiro">Solteiro</mat-option>
+                    <mat-option value="Casado">Casado</mat-option>
+                    <mat-option value="Divorciado">Divorciado</mat-option>
+                    <mat-option value="Viúvo">Viúvo</mat-option>
+                    <mat-option value="União Estável">União Estável</mat-option>
+                  </mat-select>
+                  <mat-error [appControlErrorDisplay]="registerForm.get('estadoCivil')!"></mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Linha 4: Telefone e Email -->
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Telefone</mat-label>
+                  <input matInput type="text" formControlName="telefone" placeholder="(00) 00000-0000" required mask="(00) 00000-0000||(00) 0000-0000">
+                  <mat-error [appControlErrorDisplay]="registerForm.get('telefone')!"></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Email</mat-label>
+                  <input matInput type="email" formControlName="email" placeholder="seuemail@exemplo.com" required>
+                  <mat-error [appControlErrorDisplay]="registerForm.get('email')!"></mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Linha 5: Senha e Confirmar Senha -->
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Senha</mat-label>
+                  <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="********" required>
+                  <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" [attr.aria-label]="'Ocultar senha'" [attr.aria-pressed]="hidePassword">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-error [appControlErrorDisplay]="registerForm.get('password')!"></mat-error>
+                </mat-form-field>
+                <div class="password-strength-indicator">
+                  <mat-progress-bar mode="determinate" [value]="passwordStrength" [color]="passwordStrengthColor"></mat-progress-bar>
+                  <span [ngClass]="'strength-text-' + passwordStrengthColor">{{ passwordStrengthText }}</span>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Confirmar Senha</mat-label>
+                  <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="********" required>
+                  <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Ocultar senha'" [attr.aria-pressed]="hideConfirmPassword">
+                    <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-error [appControlErrorDisplay]="registerForm.get('confirmPassword')!"></mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Linha 6: Barra de Carregamento e Botão Cadastrar -->
+            <div class="row">
+              <div class="col-12">
+                <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="accent"></mat-progress-bar>
+                <button mat-raised-button color="primary" type="submit" class="full-width login-button" [disabled]="registerForm.invalid || isLoading">
+                  <mat-icon>person_add</mat-icon> Cadastrar
+                </button>
+              </div>
+            </div>
+          </form>
+        </mat-card-content>
+
+        <mat-card-actions class="login-actions">
+          <button mat-button style="color: #76A0D9;" color="accent" (click)="onBackToLogin()">Voltar ao Login</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
   </div>
+</div>
