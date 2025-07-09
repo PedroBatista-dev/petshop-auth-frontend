@@ -1,6 +1,6 @@
 // src/app/features/auth/pages/login/login.component.ts
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router'; 
 
@@ -9,6 +9,8 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { finalize } from 'rxjs/operators';
 import { ControlErrorDisplayDirective } from '../../../../shared/directives/control-error-display.directive';
+import { BaseComponent } from '../../../../shared/components/base/base.component';
+import { LoginPayload } from '../../../../core/auth/models/auth.model';
 
 @Component({
     selector: 'app-login',
@@ -21,44 +23,41 @@ import { ControlErrorDisplayDirective } from '../../../../shared/directives/cont
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
-  isLoading = false;
+export class LoginComponent extends BaseComponent {
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private notificationService: NotificationService,
-    private router: Router
+    protected override fb: FormBuilder,
+    protected override router: Router,
+    protected override notificationService: NotificationService,
+    protected override authService: AuthService,
   ) {
-    this.loginForm = this.fb.group({
+    super(fb, router, notificationService, authService);
+  }
+
+  override onBuildForm(): void {
+    this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
-  ngOnInit(): void {
-    this.authService.isLoggedIn().subscribe(loggedIn => {
-      if (loggedIn) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
-  }
-
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
+  override onSubmit(): void {
+    if (this.form.invalid) {
       this.notificationService.error('Erro no Formulário', 'Por favor, preencha todos os campos corretamente.');
+      this.markAllFormFieldsAsTouched();
       return;
     }
+
     this.isLoading = true;
-    const { email, password } = this.loginForm.value;
-    this.authService.login({ email, password }).pipe(
+
+    const payload = new LoginPayload(this.form.value);
+    this.authService.login(payload).pipe(
       finalize(() => {
         this.isLoading = false;
-        this.loginForm.reset();
+        this.form.reset();
       })
     ).subscribe({
-      next: (response) => console.log('Login bem-sucedido:', response),
+      next: (response) => console.log('Login bem-sucedido:', 'Bem-vindo(a) ao PetConnect!'),
       error: (err) => console.error('Erro durante o login:', err)
     });
   }

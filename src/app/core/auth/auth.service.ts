@@ -7,17 +7,7 @@ import { Router } from '@angular/router';
 import { NotificationService } from '../../shared/services/notification.service';
 import { environment } from '../../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
-
-interface LoginResponse {
-  access_token: string;
-}
-
-interface UserProfile {
-  userId: string;
-  email: string;
-  cargoDescricao: string;
-  codigoEmpresaId?: string;
-}
+import { LoginPayload, LoginResponse, RegisterClientPayload, UserProfile } from './models/auth.model';
 
 @Injectable({
   providedIn: 'root' // Mantenha para ser injetável em qualquer lugar
@@ -30,8 +20,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router,
     private notificationService: NotificationService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object 
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -80,7 +70,6 @@ export class AuthService {
   }
 
   private async loadUserProfile() {
-    // Já é chamado dentro de um bloco isBrowser, mas reforça
     if (!this.isBrowser) {
       return;
     }
@@ -93,12 +82,11 @@ export class AuthService {
     }
   }
 
-  login(credentials: { email: string; password: string }): Observable<any> {
-    // Isso será executado apenas no navegador após a hidratação
+  login(payload: LoginPayload): Observable<any> {
     this.notificationService.loading('Realizando login...');
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, payload).pipe(
       tap(response => {
-        if (this.isBrowser) { // <-- Verificação para localStorage
+        if (this.isBrowser) { 
           localStorage.setItem('jwt_token', response.access_token);
         }
         this.loadUserProfile();
@@ -117,9 +105,28 @@ export class AuthService {
       })
     );
   }
+  
+  registerUser(payload: RegisterClientPayload): Observable<any> {
+    this.notificationService.loading('Registrando usuário...');
+    return this.http.post(`${this.apiUrl}/auth/register/cliente`, payload).pipe(
+      tap(() => {
+        this.notificationService.closeLoading();
+        this.notificationService.success('Cadastro Realizado!', 'Seu cadastro foi efetuado com sucesso. Faça login para acessar.');
+      }),
+      catchError(error => {
+        this.notificationService.closeLoading();
+        let errorMessage = 'Erro ao registrar usuário.';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        }
+        this.notificationService.error('Erro', errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
 
   logout(): void {
-    if (this.isBrowser) { // <-- Verificação para localStorage
+    if (this.isBrowser) {
       localStorage.removeItem('jwt_token');
     }
     this.loggedIn.next(false);

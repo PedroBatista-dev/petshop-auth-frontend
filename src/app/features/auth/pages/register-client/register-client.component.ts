@@ -1,5 +1,5 @@
 // src/app/features/auth/pages/register-client/register-client.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -18,6 +18,10 @@ import { telefoneValidator } from '../../../../shared/validators/telefone.valida
 import { strongPasswordValidator } from '../../../../shared/validators/strong-password.validator';
 import zxcvbn from 'zxcvbn';
 import { dateFormatValidator } from '../../../../shared/validators/date-format.validator';
+import { BaseComponent } from '../../../../shared/components/base/base.component';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { RegisterClientPayload } from '../../../../core/auth/models/auth.model';
+import { matchPasswordsValidator } from '../../../../shared/validators/match-passwords.validator';
 
 @Component({
     selector: 'app-register-client',
@@ -33,11 +37,7 @@ import { dateFormatValidator } from '../../../../shared/validators/date-format.v
     templateUrl: './register-client.component.html',
     styleUrls: ['./register-client.component.scss']
 })
-export class RegisterClientComponent implements OnInit {
-  registerForm: FormGroup;
-  isLoading = false;
-  private apiUrl = environment.backendAuthUrl;
-
+export class RegisterClientComponent extends BaseComponent {
   passwordStrength = 0; 
   passwordStrengthText = 'Nenhuma';
   passwordStrengthColor = 'warn';
@@ -46,12 +46,18 @@ export class RegisterClientComponent implements OnInit {
   hideConfirmPassword = true;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private notificationService: NotificationService,
+    protected override fb: FormBuilder,
+    protected override router: Router,
+    protected override notificationService: NotificationService,
+    protected override authService: AuthService,
     private http: HttpClient 
   ) {
-    this.registerForm = this.fb.group({
+    super(fb, router, notificationService, authService);
+    
+  }
+
+  override onBuildForm(): void {
+    this.form = this.fb.group({
       nomeCompleto: ['', [Validators.required, Validators.minLength(3)]],
       cpf: ['', [Validators.required, cpfValidator()]],
       dataNascimento: ['', [Validators.required, dateFormatValidator()]], 
@@ -64,14 +70,15 @@ export class RegisterClientComponent implements OnInit {
     },
     {
       validators: [
-        this.matchPasswordsGroup
+        matchPasswordsValidator('password', 'confirmPassword')
       ]
     });
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     // Observa as mudanças no campo 'password' para calcular a força
-    this.registerForm.get('password')?.valueChanges
+    this.form.get('password')?.valueChanges
       .pipe(
         debounceTime(300) // Espera 300ms para o usuário parar de digitar
       )
@@ -116,71 +123,26 @@ export class RegisterClientComponent implements OnInit {
     }
   }
 
-
-  private matchPasswordsGroup: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-    const passwordControl = group.get('password');
-    const confirmPasswordControl = group.get('confirmPassword');
-
-    if (!passwordControl || !confirmPasswordControl) {
-      return null;
-    }
-
-    if (passwordControl.value !== confirmPasswordControl.value && (confirmPasswordControl.touched || confirmPasswordControl.dirty)) {
-      confirmPasswordControl.setErrors({ mismatch: true });
-      return { mismatch: true };
-    }
-
-    if (passwordControl.value === confirmPasswordControl.value && confirmPasswordControl.hasError('mismatch')) {
-        confirmPasswordControl.setErrors(null);
-    }
-
-    return null; 
-  };
-
-  onSubmit(): void {
-    if (this.registerForm.invalid) {
+  override onSubmit(): void {
+    if (this.form.invalid) {
       this.notificationService.error('Erro no Formulário', 'Por favor, preencha todos os campos corretamente.');
-      this.registerForm.markAllAsTouched();
+      this.markAllFormFieldsAsTouched();
       return;
     }
 
     this.isLoading = true;
-    const formValue = this.registerForm.value;
 
-    const userData = {
-      nomeCompleto: formValue.nomeCompleto,
-      cpf: formValue.cpf,
-      dataNascimento: formValue.dataNascimento, // Assumindo formato YYYY-MM-DD
-      sexo: formValue.sexo,
-      estadoCivil: formValue.estadoCivil,
-      telefone: formValue.telefone,
-      email: formValue.email,
-      password: formValue.password
-      // codigoCargoId e codigoEmpresaId são definidos no backend para clientes auto-registrados
-    };
+    const payload = new RegisterClientPayload(this.form.value);
 
-    // Chamada para o endpoint de registro de cliente do seu backend
-    this.http.post(`${this.apiUrl}/auth/register/cliente`, userData).pipe(
+    this.authService.registerUser(payload).pipe(
       finalize(() => {
         this.isLoading = false;
+        this.form.reset();
       })
     ).subscribe({
-      next: () => {
-        this.notificationService.success('Cadastro Realizado!', 'Seu cadastro foi efetuado com sucesso. Faça login para acessar.');
-        this.router.navigate(['/auth/login']);
-      },
-      error: (err) => {
-        let errorMessage = 'Erro ao cadastrar. Tente novamente.';
-        if (err.error && err.error.message) {
-          errorMessage = err.error.message;
-        }
-        this.notificationService.error('Erro no Cadastro', errorMessage);
-        console.error('Erro durante o cadastro:', err);
-      }
+      next: () => this.onBackToLogin(),
+      error: (err) => 
+        console.error('Erro ao registrar usuário:', err)
     });
-  }
-
-  onBackToLogin(): void {
-    this.router.navigate(['/auth/login']);
   }
 }

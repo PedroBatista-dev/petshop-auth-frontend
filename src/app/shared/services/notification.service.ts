@@ -1,6 +1,6 @@
 // src/app/shared/services/notification.service.ts
 import { Injectable } from '@angular/core';
-import Swal, { SweetAlertIcon } from 'sweetalert2';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'

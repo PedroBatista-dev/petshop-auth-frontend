@@ -9,6 +9,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { finalize } from 'rxjs/operators';
 import { ControlErrorDisplayDirective } from '../../../../shared/directives/control-error-display.directive';
+import { BaseComponent } from '../../../../shared/components/base/base.component';
 
 @Component({
     selector: 'app-forgot-password',
@@ -21,48 +22,43 @@ import { ControlErrorDisplayDirective } from '../../../../shared/directives/cont
     templateUrl: './forgot-password.component.html',
     styleUrls: ['./forgot-password.component.scss']
 })
-export class ForgotPasswordComponent {
-  forgotPasswordForm: FormGroup;
-  isLoading = false;
+export class ForgotPasswordComponent extends BaseComponent {
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private notificationService: NotificationService,
-    private router: Router
+    protected override fb: FormBuilder,
+    protected override router: Router,
+    protected override notificationService: NotificationService,
+    protected override authService: AuthService,
   ) {
-    this.forgotPasswordForm = this.fb.group({
+    super(fb, router, notificationService, authService);
+  }
+
+  override onBuildForm(): void {
+    this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
   }
 
   onSubmit(): void {
-    if (this.forgotPasswordForm.invalid) {
+    if (this.form.invalid) {
       this.notificationService.error('Erro no Formulário', 'Por favor, insira um e-mail válido.');
       return;
     }
 
     this.isLoading = true;
-    const { email } = this.forgotPasswordForm.value;
+    
+    const { email } = this.form.value;
 
     this.authService.forgotPassword(email).pipe(
       finalize(() => {
         this.isLoading = false;
-        this.forgotPasswordForm.reset();
+        this.form.reset();
       })
     ).subscribe({
-      next: () => {
-        // A mensagem de sucesso já é tratada no AuthService
-        this.router.navigate(['/auth/login']); // Redireciona para o login ou instrui a verificar o email
-      },
-      error: (err) => {
-        // Mensagem de erro já tratada no AuthService
-        console.error('Erro ao solicitar recuperação de senha:', err);
-      }
+      next: () => this.onBackToLogin(),
+      error: (err) => 
+        console.error('Erro ao solicitar recuperação de senha:', err)
     });
   }
 
-  onBackToLogin(): void {
-    this.router.navigate(['/auth/login']);
-  }
 }

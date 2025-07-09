@@ -1,6 +1,6 @@
 // src/app/features/auth/pages/reset-password/reset-password.component.ts
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -11,6 +11,8 @@ import { debounceTime, finalize } from 'rxjs/operators';
 import { strongPasswordValidator } from '../../../../shared/validators/strong-password.validator';
 import zxcvbn from 'zxcvbn';
 import { ControlErrorDisplayDirective } from '../../../../shared/directives/control-error-display.directive';
+import { BaseComponent } from '../../../../shared/components/base/base.component';
+import { matchPasswordsValidator } from '../../../../shared/validators/match-passwords.validator';
 
 @Component({
     selector: 'app-reset-password',
@@ -23,9 +25,7 @@ import { ControlErrorDisplayDirective } from '../../../../shared/directives/cont
     templateUrl: './reset-password.component.html',
     styleUrls: ['./reset-password.component.scss']
 })
-export class ResetPasswordComponent implements OnInit {
-  resetPasswordForm: FormGroup;
-  isLoading = false;
+export class ResetPasswordComponent extends BaseComponent {
   token: string | null = null; // Armazena o token da URL
 
   passwordStrength = 0; // Pontuação de 0 a 100%
@@ -36,24 +36,29 @@ export class ResetPasswordComponent implements OnInit {
   hideConfirmPassword = true;
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private notificationService: NotificationService,
-    private router: Router,
+    protected override fb: FormBuilder,
+    protected override router: Router,
+    protected override notificationService: NotificationService,
+    protected override authService: AuthService,
     private route: ActivatedRoute // Injete ActivatedRoute para ler parâmetros da URL
   ) {
-    this.resetPasswordForm = this.fb.group({
+    super(fb, router, notificationService, authService);
+  }
+
+  override onBuildForm(): void {
+    this.form = this.fb.group({
       newPassword: ['', [Validators.required, strongPasswordValidator()]],
       confirmPassword: ['', [Validators.required]]
     },
     {
       validators: [
-        this.matchPasswordsGroup
+        matchPasswordsValidator('newPassword', 'confirmPassword')
       ]
     });
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     // Tenta pegar o token da query parameter da URL
     this.route.queryParams.subscribe(params => {
       this.token = params['token'] || null;
@@ -64,7 +69,7 @@ export class ResetPasswordComponent implements OnInit {
     });
 
     // Observa as mudanças no campo 'password' para calcular a força
-    this.resetPasswordForm.get('newPassword')?.valueChanges
+    this.form.get('newPassword')?.valueChanges
       .pipe(
         debounceTime(300) // Espera 300ms para o usuário parar de digitar
       )
@@ -109,29 +114,10 @@ export class ResetPasswordComponent implements OnInit {
     }
   }
 
-  private matchPasswordsGroup: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-    const passwordControl = group.get('newPassword');
-    const confirmPasswordControl = group.get('confirmPassword');
-
-    if (!passwordControl || !confirmPasswordControl) {
-      return null;
-    }
-
-    if (passwordControl.value !== confirmPasswordControl.value && (confirmPasswordControl.touched || confirmPasswordControl.dirty)) {
-      confirmPasswordControl.setErrors({ mismatch: true });
-      return { mismatch: true };
-    }
-
-    if (passwordControl.value === confirmPasswordControl.value && confirmPasswordControl.hasError('mismatch')) {
-        confirmPasswordControl.setErrors(null);
-    }
-
-    return null; 
-  };
-
-  onSubmit(): void {
-    if (this.resetPasswordForm.invalid) {
+  override onSubmit(): void {
+    if (this.form.invalid) {
       this.notificationService.error('Erro no Formulário', 'Por favor, preencha todos os campos e certifique-se que as senhas coincidem.');
+      this.markAllFormFieldsAsTouched();
       return;
     }
     if (!this.token) {
@@ -141,12 +127,12 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     this.isLoading = true;
-    const { newPassword } = this.resetPasswordForm.value;
+    const { newPassword } = this.form.value;
 
     this.authService.resetPassword(this.token, newPassword).pipe(
       finalize(() => {
         this.isLoading = false;
-        this.resetPasswordForm.reset();
+        this.form.reset();
       })
     ).subscribe({
       next: () => {
@@ -157,9 +143,5 @@ export class ResetPasswordComponent implements OnInit {
         console.error('Erro ao redefinir senha:', err);
       }
     });
-  }
-
-  onBackToLogin(): void {
-    this.router.navigate(['/auth/login']);
   }
 }
