@@ -51,4 +51,19 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  formatDate(label: string): void {
+    if (this.form.value[label] instanceof Date) { 
+      const date = this.form.value[label];
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      this.form.get(label)?.setValue(`${year}-${month}-${day}`); 
+    } else if (typeof this.form.value[label] === 'string' && this.form.value[label].includes('/')) {
+        const parts = this.form.value[label].split('/');
+        if (parts.length === 3) {
+          this.form.get(label)?.setValue(`${parts[2]}-${parts[1]}-${parts[0]}`); // AAAA-MM-DD
+        }
+    }
+  }
 }

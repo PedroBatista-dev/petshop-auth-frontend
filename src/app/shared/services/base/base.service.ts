@@ -3,27 +3,34 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { NotificationService } from '../notification.service';
+import { Inject, PLATFORM_ID } from '@angular/core'; 
+import { isPlatformBrowser } from '@angular/common';
 
 export abstract class BaseService<T> { 
   protected apiUrl: string; 
+  protected isBrowser: boolean;
 
   constructor(
     protected http: HttpClient,
     protected notificationService: NotificationService,
-    baseUrl: string 
+    protected baseUrl: string,
+    @Inject(PLATFORM_ID) protected platformId: Object
   ) {
     this.apiUrl = baseUrl;
+    this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   protected handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Ocorreu um erro desconhecido na operação.';
 
-    if (error.error instanceof ErrorEvent) {
-      // Erro do lado do cliente ou de rede
+    // CORREÇÃO AQUI: Verifique se está no navegador antes de usar ErrorEvent
+    if (this.isBrowser && error.error instanceof ErrorEvent) {
+      // Erro do lado do cliente (navegador) ou de rede
       errorMessage = `Erro de Conexão: ${error.error.message}`;
     } else {
-      // Erro do lado do servidor (respostas HTTP com status de erro)
+      // Erro do lado do servidor ou outros erros que não são ErrorEvent
       if (error.status === 0) {
+        // Erro de rede ou CORS que não gerou uma resposta HTTP válida
         errorMessage = 'Não foi possível conectar ao servidor. Verifique sua conexão de internet ou tente novamente mais tarde.';
       } else if (error.error && error.error.message) {
         // Erros de validação do NestJS ou mensagens de erro personalizadas do backend
@@ -34,10 +41,12 @@ export abstract class BaseService<T> {
         }
       } else {
         errorMessage = `Erro no Servidor: Código ${error.status}, mensagem: ${error.message}`;
+        // Opcional: Para debugar erros que não são do tipo ErrorEvent e não tem message no .error
+        // console.error('Full server error object:', error);
       }
     }
-    this.notificationService.error('Erro na Operação', errorMessage); // Exibe a notificação de erro
-    return throwError(() => new Error(errorMessage)); // Propaga o erro para o subscriber
+    this.notificationService.error('Erro na Operação', errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 
   // Método genérico para requisições GET

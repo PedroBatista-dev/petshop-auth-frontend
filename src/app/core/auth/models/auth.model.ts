@@ -54,25 +54,6 @@ export class LoginPayload {
       Object.assign(this, data);
     }
   
-    // Método para limpar o CPF antes de enviar
-    getCleanedCpf(): string {
-      return this.cpf ? this.cpf.replace(/[^\d]+/g, '') : '';
-    }
-  
-    // Método para limpar o Telefone antes de enviar
-    getCleanedTelefone(): string {
-      return this.telefone ? String(this.telefone).replace(/[^\d]+/g, '') : '';
-    }
-  
-    // Método para formatar a data de nascimento para o backend
-    getFormattedDataNascimento(): string {
-      if (!this.dataNascimento) return '';
-      const parts = this.dataNascimento.split('/');
-      if (parts.length === 3) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`; // AAAA-MM-DD
-      }
-      return this.dataNascimento; // Retorna original se não estiver no formato esperado
-    }
   }
   
   /**

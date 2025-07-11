@@ -1,6 +1,6 @@
 // src/app/features/auth/pages/register-client/register-client.component.ts
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -8,8 +8,6 @@ import { MaterialImports } from '../../../../shared/material/material.imports';
 import { NgxMaskDirective } from 'ngx-mask';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { debounceTime, finalize } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http'; 
-import { environment } from '../../../../../environments/environment';
 import { cpfValidator } from '../../../../shared/validators/cpf.validator';
 import { ControlErrorDisplayDirective } from '../../../../shared/directives/control-error-display.directive';
 import { PrimeiraLetraMaiusculaDirective } from '../../../../shared/directives/first-capital-letter.directive';
@@ -22,6 +20,10 @@ import { BaseComponent } from '../../../../shared/components/base/base.component
 import { AuthService } from '../../../../core/auth/auth.service';
 import { RegisterClientPayload } from '../../../../core/auth/models/auth.model';
 import { matchPasswordsValidator } from '../../../../shared/validators/match-passwords.validator';
+import { Empresa } from '../../../../shared/models/empresa.model';
+import { Observable } from 'rxjs';
+import { EmpresaService } from '../../../../shared/services/empresa/empresa.service';
+import { GenericAutocompleteComponent, AutocompleteItem } from '../../../../shared/components/generic-autocomplete/generic-autocomplete.component';
 
 @Component({
     selector: 'app-register-client',
@@ -33,6 +35,7 @@ import { matchPasswordsValidator } from '../../../../shared/validators/match-pas
         ControlErrorDisplayDirective,
         PrimeiraLetraMaiusculaDirective,
         AutoFocusDirective,
+        GenericAutocompleteComponent
     ],
     templateUrl: './register-client.component.html',
     styleUrls: ['./register-client.component.scss']
@@ -50,7 +53,7 @@ export class RegisterClientComponent extends BaseComponent {
     protected override router: Router,
     protected override notificationService: NotificationService,
     protected override authService: AuthService,
-    private http: HttpClient 
+    public empresaService: EmpresaService,
   ) {
     super(fb, router, notificationService, authService);
     
@@ -66,7 +69,9 @@ export class RegisterClientComponent extends BaseComponent {
       telefone: ['', [Validators.required, telefoneValidator()]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, strongPasswordValidator()]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required]],
+      empresaAutocomplete: ['', [Validators.required]],
+      codigoEmpresaId: [''],
     },
     {
       validators: [
@@ -93,6 +98,10 @@ export class RegisterClientComponent extends BaseComponent {
           this.passwordStrengthColor = 'warn';
         }
       });
+  }
+
+  onEmpresaSelected(selectedItem: AutocompleteItem): void {
+    this.form.get('codigoEmpresaId')?.setValue(selectedItem.id); 
   }
 
   private updatePasswordStrengthText(score: number): void {
@@ -132,7 +141,11 @@ export class RegisterClientComponent extends BaseComponent {
 
     this.isLoading = true;
 
-    const payload = new RegisterClientPayload(this.form.value);
+    this.formatDate('dataNascimento');
+
+    const { confirmPassword, empresaAutocomplete, ...formData } = this.form.value;
+
+    const payload = new RegisterClientPayload(formData);
 
     this.authService.registerUser(payload).pipe(
       finalize(() => {

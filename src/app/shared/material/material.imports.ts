@@ -8,6 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select'; // NOVO
 import { MatDatepickerModule } from '@angular/material/datepicker'; // NOVO
 import { MatNativeDateModule } from '@angular/material/core'; // NOVO: Necessário para MatDatepicker
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 export const MaterialImports = [
   MatFormFieldModule,
@@ -18,5 +19,6 @@ export const MaterialImports = [
   MatProgressBarModule,
   MatSelectModule,     
   MatDatepickerModule, 
-  MatNativeDateModule
+  MatNativeDateModule,
+  MatAutocompleteModule
 ];

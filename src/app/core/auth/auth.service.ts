@@ -124,6 +124,25 @@ export class AuthService {
       })
     );
   }
+  
+  registerEnterprise(payload: RegisterClientPayload): Observable<any> {
+    this.notificationService.loading('Registrando empresa...');
+    return this.http.post(`${this.apiUrl}/auth/register/empresa`, payload).pipe(
+      tap(() => {
+        this.notificationService.closeLoading();
+        this.notificationService.success('Cadastro Realizado!', 'Seu cadastro foi efetuado com sucesso.');
+      }),
+      catchError(error => {
+        this.notificationService.closeLoading();
+        let errorMessage = 'Erro ao registrar empresa.';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        }
+        this.notificationService.error('Erro', errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
 
   logout(): void {
     if (this.isBrowser) {

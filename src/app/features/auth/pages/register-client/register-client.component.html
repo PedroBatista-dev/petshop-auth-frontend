@@ -92,6 +92,20 @@
               </div>
             </div>
 
+            <div class="row">
+              <div class="col-12">
+                <app-generic-autocomplete
+                  [control]="form.get('empresaAutocomplete')!"
+                  [service]="empresaService"
+                  displayProperty="razaoSocial"
+                  label="Empresa"
+                  placeholder="Pesquisar por razão social"
+                  (itemSelected)="onEmpresaSelected($event)">
+                </app-generic-autocomplete>
+                <input type="hidden" formControlName="codigoEmpresaId">
+              </div>
+            </div>
+
             <!-- Linha 5: Senha e Confirmar Senha -->
             <div class="row">
               <div class="col-md-6 col-12">

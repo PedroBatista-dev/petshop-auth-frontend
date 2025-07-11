@@ -69,4 +69,8 @@ export class LoginComponent extends BaseComponent {
   onRegisterClient(): void {
     this.router.navigate(['/auth/register-client']);
   }
+  
+  onRegisterEnterprise(): void {
+    this.router.navigate(['/auth/register-enterprise']);
+  }
 }
