@@ -1,5 +1,5 @@
 /* src/app/features/auth/pages/register-client/register-client.component.scss */
-@import '../login/login.component.scss'; /* Isso já traz todos os estilos de layout e fundo */
+@use '../login/login.component.scss'; /* Isso já traz todos os estilos de layout e fundo */
 
 // Ajustes para o formulário e campos dentro do grid Bootstrap
 .login-form {
