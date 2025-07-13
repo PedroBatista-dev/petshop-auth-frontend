@@ -6,11 +6,11 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { CUSTOM_DATE_FORMATS } from './shared/utils/custom-date-formats';
 import { provideNgxMask } from 'ngx-mask';
+import { AuthInterceptor } from '../../projects/core-auth/src/lib/interceptors/auth.interceptor';
+import { CUSTOM_DATE_FORMATS } from '../../projects/shared-ui-utils/src/lib/utils/custom-date-formats';
 
 export const appConfig: ApplicationConfig = {
   providers: [

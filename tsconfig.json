@@ -1,8 +1,14 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "core-auth": [
+        "./dist/core-auth"
+      ],
+      "shared-ui-utils": [
+        "./dist/shared-ui-utils"
+      ]
+    },
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
@@ -28,5 +34,13 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": false
-  }
+  },
+  "references": [
+    {
+      "path": "./projects/auth-mfe/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/financeiro-mfe/tsconfig.app.json"
+    }
+  ]
 }

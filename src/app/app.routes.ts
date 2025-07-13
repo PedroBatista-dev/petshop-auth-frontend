@@ -1,18 +1,26 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
+import { loadRemoteModule } from '@angular-architects/module-federation';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth.routes').then(r => r.AUTH_ROUTES) // Carrega as rotas filhas do MFE de autenticação
+    loadChildren: () =>
+      loadRemoteModule({
+        remoteEntry: 'http://localhost:4201/remoteEntry.js', // URL do Auth MFE
+        remoteName: 'authMfe',
+        exposedModule: './Routes', // O que o Auth MFE expôs (nome do arquivo de rotas)
+      }).then((m) => m.remoteRoutes), // O nome da exportação das rotas
   },
   {
-    // Esta rota simula o shell redirecionando para um componente de outro MFE.
-    // Em um setup real de MFE, 'dashboard' poderia ser um sub-projeto carregado por Module Federation.
-    // Por enquanto, é um componente "dummy" para mostrar o redirecionamento.
     path: 'dashboard',
-    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) // Vamos criar este componente dummy
+    loadChildren: () =>
+      loadRemoteModule({
+        remoteEntry: 'http://localhost:4202/remoteEntry.js', // URL do Financeiro MFE
+        remoteName: 'financeiroMfe',
+        exposedModule: './Routes', // O que o Financeiro MFE expôs
+      }).then((m) => m.appRoutes), // O nome da exportação das rotas
   },
-  { path: '**', redirectTo: 'auth' } // Redireciona rotas não encontradas para o login
+  { path: '**', redirectTo: 'auth' },
 ];
