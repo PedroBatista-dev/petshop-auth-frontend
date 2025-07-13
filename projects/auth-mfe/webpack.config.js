@@ -1,4 +1,5 @@
 const { shareAll, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack');
+const path = require('path');
 
 module.exports = withModuleFederationPlugin(
   { // Primeiro argumento: Opções específicas do Module Federation Plugin
@@ -19,12 +20,10 @@ module.exports = withModuleFederationPlugin(
     output: {
       uniqueName: 'authMfe',
       publicPath: 'auto',
+      libraryTarget: 'var',
     },
     optimization: {
       runtimeChunk: false,
-    },
-    experiments: {
-      outputModule: true,
     },
     context: path.resolve(__dirname, './'), // Define o contexto para a pasta onde este webpack.config.js está (projects/auth-mfe)
     resolve: {

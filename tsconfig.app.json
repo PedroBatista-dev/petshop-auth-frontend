@@ -2,9 +2,13 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
+    "composite": true,
+    "declaration": true,
     "types": [
       "node"
-    ]
+    ],
+    "target": "es2022", // Geralmente es2022 para Angular mais recente
+    "useDefineForClassFields": false
   },
   "files": [
     "src/main.ts",
@@ -12,6 +16,6 @@
     "server.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    // "src/**/*.d.ts"
   ]
 }
