@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.app.json",
+    "compilerOptions": {
+      "outDir": "../../dist/out-tsc/server",
+      "target": "es2022",
+      "module": "esnext", // ou "commonjs" dependendo da sua configuração específica do Node.js
+      "esModuleInterop": true,
+      "types": []
+    },
+    "files": [
+      "src/main.server.ts"
+    ]
+  }

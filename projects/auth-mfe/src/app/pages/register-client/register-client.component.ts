@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BaseComponent } from '../../../../../../projects/shared-ui-utils/src/lib/components/base/base.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -36,7 +36,7 @@ import zxcvbn from 'zxcvbn';
   templateUrl: './register-client.component.html',
   styleUrl: './register-client.component.scss'
 })
-export class RegisterClientComponent extends BaseComponent {
+export class RegisterClientComponent extends BaseComponent implements OnInit {
 
   passwordStrength = 0; 
   passwordStrengthText = 'Nenhuma';
@@ -77,8 +77,7 @@ export class RegisterClientComponent extends BaseComponent {
     });
   }
 
-  override ngOnInit(): void {
-    super.ngOnInit();
+  ngOnInit(): void {
     this.form.get('password')?.valueChanges
       .pipe(
         debounceTime(300) 

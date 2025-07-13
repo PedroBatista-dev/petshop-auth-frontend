@@ -6,10 +6,15 @@
       "node"
     ],
     "composite": true,
-    "declaration": true
+    "declaration": true,
+    "target": "es2022", // Geralmente es2022 para Angular mais recente
+    "useDefineForClassFields": false
   },
+  "files": [ // Liste APENAS os pontos de entrada primários do seu build de browser
+    "src/main.ts"
+  ],
   "include": [
-    "src/**/*.ts"
+    // "src/**/*.ts"
   ],
   "exclude": [
     "src/**/*.spec.ts"

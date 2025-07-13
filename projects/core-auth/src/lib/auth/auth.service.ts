@@ -6,7 +6,7 @@ import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { LoginPayload, LoginResponse, RegisterClientPayload, UserProfile } from './models/auth.model';
-import { environment } from '../../../../../src/environments/environment.prod';
+import { environment } from '../../../../../src/environments/environment';
 import { NotificationService } from '../../../../shared-ui-utils/src/lib/services/notification.service';
 
 @Injectable({
@@ -85,7 +85,7 @@ export class AuthService {
   login(payload: LoginPayload): Observable<any> {
     this.notificationService.loading('Realizando login...');
     return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, payload).pipe(
-      tap(response => {
+      tap((response: any) => {
         if (this.isBrowser) { 
           localStorage.setItem('jwt_token', response.access_token);
         }
@@ -94,7 +94,7 @@ export class AuthService {
         this.notificationService.success('Sucesso!', 'Login realizado com sucesso!');
         this.router.navigate(['/dashboard']);
       }),
-      catchError(error => {
+      catchError((error: any) => {
         this.notificationService.closeLoading();
         let errorMessage = 'Erro ao realizar login. Tente novamente.';
         if (error.error && error.error.message) {
@@ -113,7 +113,7 @@ export class AuthService {
         this.notificationService.closeLoading();
         this.notificationService.success('Cadastro Realizado!', 'Seu cadastro foi efetuado com sucesso. Faça login para acessar.');
       }),
-      catchError(error => {
+      catchError((error: any) => {
         this.notificationService.closeLoading();
         let errorMessage = 'Erro ao registrar usuário.';
         if (error.error && error.error.message) {
@@ -132,7 +132,7 @@ export class AuthService {
         this.notificationService.closeLoading();
         this.notificationService.success('Cadastro Realizado!', 'Seu cadastro foi efetuado com sucesso.');
       }),
-      catchError(error => {
+      catchError((error: any) => {
         this.notificationService.closeLoading();
         let errorMessage = 'Erro ao registrar empresa.';
         if (error.error && error.error.message) {
@@ -161,7 +161,7 @@ export class AuthService {
         this.notificationService.closeLoading();
         this.notificationService.success('E-mail Enviado', 'Verifique sua caixa de entrada para instruções de recuperação de senha.');
       }),
-      catchError(error => {
+      catchError((error: any) => {
         this.notificationService.closeLoading();
         let errorMessage = 'Erro ao solicitar recuperação de senha.';
         if (error.error && error.error.message) {
@@ -181,7 +181,7 @@ export class AuthService {
         this.notificationService.success('Senha Redefinida', 'Sua senha foi redefinida com sucesso. Faça login com a nova senha.');
         this.router.navigate(['/auth/login']);
       }),
-      catchError(error => {
+      catchError((error: any) => {
         this.notificationService.closeLoading();
         let errorMessage = 'Erro ao redefinir senha.';
         if (error.error && error.error.message) {

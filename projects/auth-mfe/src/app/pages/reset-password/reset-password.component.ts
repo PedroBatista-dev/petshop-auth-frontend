@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BaseComponent } from '../../../../../../projects/shared-ui-utils/src/lib/components/base/base.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -23,7 +23,7 @@ import zxcvbn from 'zxcvbn';
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'
 })
-export class ResetPasswordComponent extends BaseComponent {
+export class ResetPasswordComponent extends BaseComponent implements OnInit {
 
   token: string | null = null; // Armazena o token da URL
 
@@ -56,9 +56,7 @@ export class ResetPasswordComponent extends BaseComponent {
     });
   }
 
-  override ngOnInit(): void {
-    super.ngOnInit();
-    // Tenta pegar o token da query parameter da URL
+  ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.token = params['token'] || null;
       if (!this.token) {

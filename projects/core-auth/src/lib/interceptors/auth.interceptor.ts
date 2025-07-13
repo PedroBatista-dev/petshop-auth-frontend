@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs';
 import { inject, Injector, PLATFORM_ID } from '@angular/core'; 
 import { isPlatformBrowser } from '@angular/common';
-import { environment } from '../../../../../src/environments/environment.prod';
+import { environment } from '../../../../../src/environments/environment';
 
 export const AuthInterceptor: HttpInterceptorFn = (
   request: HttpRequest<unknown>,

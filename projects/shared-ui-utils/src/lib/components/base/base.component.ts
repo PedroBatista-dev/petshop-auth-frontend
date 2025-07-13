@@ -7,7 +7,7 @@ import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../../../../core-auth/src/lib/auth/auth.service';
 
 @Directive()
-export abstract class BaseComponent implements OnInit, OnDestroy {
+export abstract class BaseComponent implements OnDestroy {
   public form!: FormGroup; 
   public isLoading = false;
   protected destroy$ = new Subject<void>(); 
@@ -24,14 +24,6 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
   abstract onSubmit(): void;
   
   abstract onBuildForm(): void;
-
-  ngOnInit(): void {
-    this.authService.isLoggedIn().subscribe(loggedIn => {
-      if (loggedIn) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
-  }
 
   onBackToLogin(): void {
     this.router.navigate(['/auth/login']);

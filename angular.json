@@ -38,9 +38,6 @@
 							"src/styles.scss"
 						],
 						"scripts": [],
-						"ssr": {
-							"entry": "server.ts"
-						},
 						"main": "src/main.ts",
 						"extraWebpackConfig": "webpack.config.js",
 						"commonChunk": false
@@ -228,10 +225,6 @@
 						"styles": [
 							"projects/auth-mfe/src/styles.scss"
 						],
-						"outputMode": "server",
-						"ssr": {
-							"entry": "projects/auth-mfe/src/server.ts"
-						},
 						"main": "projects/auth-mfe/src/main.ts",
 						"outputPath": "dist/auth-mfe",
 						"index": "projects/auth-mfe/src/index.html",
@@ -350,10 +343,6 @@
 						"styles": [
 							"projects/financeiro-mfe/src/styles.scss"
 						],
-						"outputMode": "server",
-						"ssr": {
-							"entry": "projects/financeiro-mfe/src/server.ts"
-						},
 						"main": "projects/financeiro-mfe/src/main.ts",
 						"outputPath": "dist/financeiro-mfe",
 						"index": "projects/financeiro-mfe/src/index.html",
